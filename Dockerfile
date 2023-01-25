@@ -9,8 +9,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /bin/knowledge_keeper ./cmd/knowledge_keeper/main.go
+# RUN go build -o /bin/knowledge_keeper ./cmd/knowledge_keeper/main.go
 
-CMD ["/bin/knowledge_keeper"]
+# CMD ["/bin/knowledge_keeper"]
 
-# CMD ["go", "run", "./cmd/knowledge_keeper/main.go"]
+CMD ["go", "run", "./cmd/knowledge_keeper/main.go"]

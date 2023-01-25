@@ -23,6 +23,11 @@ type Postgres struct {
 	SslMode  string `env:"DB_SSL_MODE" env-default:"disable"`
 }
 
+type Auth struct {
+	SigningKey      string `env:"AUTH_SIGHNING_KEY env-required"`
+	AccessTokenTTL  string `env:"AUTH_ACCESS_TOKEN_TTL env-required"`
+	RefreshTokenTTL string `env:"AUTH_REFRESH_TOKEN_TTL env-required"`
+}
 type Config struct {
 	HttpServer HttpServer
 	Postgres   Postgres

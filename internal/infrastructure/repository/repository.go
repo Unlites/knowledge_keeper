@@ -1,8 +1,14 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"github.com/Unlites/knowledge_keeper/internal/models"
+	"gorm.io/gorm"
+)
 
 type User interface {
+	CreateUser(ctx context.Context, user *models.User) error
 }
 
 type Record interface {

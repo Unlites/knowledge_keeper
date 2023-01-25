@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,13 +13,16 @@ import (
 	"github.com/Unlites/knowledge_keeper/internal/infrastructure/repository"
 	"github.com/Unlites/knowledge_keeper/internal/usecases"
 	"github.com/Unlites/knowledge_keeper/pkg/httpserver"
+	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/Unlites/knowledge_keeper/pkg/postgres"
 )
 
 func Run() {
+	log := logger.NewLogger()
 	cfg, err := config.Init()
+
 	if err != nil {
-		log.Fatalf("failed to initialize config: %s\n", err)
+		log.Fatal("failed to initialize config", err)
 	}
 
 	db, err := postgres.NewPostgresDb(&postgres.Settings{
@@ -32,7 +34,7 @@ func Run() {
 		SslMode:  cfg.Postgres.SslMode,
 	})
 	if err != nil {
-		log.Fatalf("failed to connect to Postgres: %s\n", err)
+		log.Fatal("failed to connect to Postgres", err)
 	}
 
 	repo := repository.NewRepository(db)
@@ -40,7 +42,7 @@ func Run() {
 
 	router := delivery.NewRouter()
 
-	handler := delivery.NewHandler(usecases, router)
+	handler := delivery.NewHandler(usecases, log, router)
 	handler.InitAPI(router)
 
 	httpServer := httpserver.NewHttpServer(&httpserver.Settings{
@@ -53,25 +55,25 @@ func Run() {
 
 	go func() {
 		if err := httpServer.Run(); !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("failed to start http server: %s\n", err)
+			log.Fatal("failed to start http server", err)
 		}
 	}()
 
-	log.Println("Http server started at port " + cfg.HttpServer.Port)
+	log.Info("Http server started at port " + cfg.HttpServer.Port)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 
 	<-quit
-	log.Println("Shutdown http server...")
+	log.Info("Shutdown http server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.HttpServer.ShutdownTimeout)
 	defer cancel()
 
 	if err := httpServer.Stop(ctx); err != nil {
-		log.Fatalf("failed to stop http server: %s", err)
+		log.Fatal("failed to stop http server", err)
 	}
 
-	log.Println("Http server stopped.")
+	log.Info("Http server stopped.")
 
 }

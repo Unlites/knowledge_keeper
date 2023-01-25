@@ -1,22 +1,58 @@
 package v1
 
 import (
+	"net/http"
+
+	"github.com/Unlites/knowledge_keeper/internal/dto"
 	"github.com/Unlites/knowledge_keeper/internal/usecases"
+	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type authHandler struct {
+	log         logger.Logger
 	group       *gin.RouterGroup
 	authUsecase usecases.Auth
 }
 
-func NewAuthHandler(group *gin.RouterGroup, authUsecase usecases.Auth) *authHandler {
+func NewAuthHandler(log logger.Logger, group *gin.RouterGroup, authUsecase usecases.Auth) *authHandler {
 	return &authHandler{
+		log:         log,
 		group:       group,
 		authUsecase: authUsecase,
 	}
 }
 
-func (a *authHandler) InitRoutes() {
+func (ah *authHandler) InitRoutes() {
+	ah.group.POST("/sign_up", ah.signUp)
+	ah.group.POST("/sign_in", ah.signIn)
+	ah.group.POST("/sign_out", ah.signOut)
+	ah.group.POST("/refresh", ah.refresh)
+}
+
+func (ah *authHandler) signUp(c *gin.Context) {
+	var userDTO *dto.UserDTO
+	if err := c.BindJSON(&userDTO); err != nil {
+		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := ah.authUsecase.SignUp(c.Request.Context(), userDTO); err != nil {
+		newHttpErrorResponse(c, ah.log, http.StatusInternalServerError, err)
+		return
+	}
+
+	newHttpSuccessResponse(c, "ok")
+}
+
+func (ah *authHandler) signIn(c *gin.Context) {
+
+}
+
+func (ah *authHandler) signOut(c *gin.Context) {
+
+}
+
+func (ah *authHandler) refresh(c *gin.Context) {
 
 }
