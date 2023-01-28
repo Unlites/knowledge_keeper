@@ -12,9 +12,11 @@ import (
 	delivery "github.com/Unlites/knowledge_keeper/internal/delivery/http"
 	"github.com/Unlites/knowledge_keeper/internal/infrastructure/repository"
 	"github.com/Unlites/knowledge_keeper/internal/usecases"
+	_ "github.com/Unlites/knowledge_keeper/migrations"
 	"github.com/Unlites/knowledge_keeper/pkg/httpserver"
 	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/Unlites/knowledge_keeper/pkg/postgres"
+	"github.com/pressly/goose"
 )
 
 func Run() {
@@ -35,6 +37,15 @@ func Run() {
 	})
 	if err != nil {
 		log.Fatal("failed to connect to Postgres", err)
+	}
+
+	sqlDbForMigrations, err := db.DB()
+	if err != nil {
+		log.Fatal("failed to connect to Postgres for migrations", err)
+	}
+
+	if err := goose.Up(sqlDbForMigrations, "/app/migrations"); err != nil {
+		log.Fatal("failed to make migrations", err)
 	}
 
 	repo := repository.NewRepository(db)

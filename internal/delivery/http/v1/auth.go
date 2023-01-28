@@ -1,9 +1,11 @@
 package v1
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Unlites/knowledge_keeper/internal/dto"
+	"github.com/Unlites/knowledge_keeper/internal/errs"
 	"github.com/Unlites/knowledge_keeper/internal/usecases"
 	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -38,6 +40,12 @@ func (ah *authHandler) signUp(c *gin.Context) {
 	}
 
 	if err := ah.authUsecase.SignUp(c.Request.Context(), userDTO); err != nil {
+		var errAlreadyExists *errs.ErrAlreadyExists
+		if errors.As(err, &errAlreadyExists) {
+			newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+			return
+		}
+
 		newHttpErrorResponse(c, ah.log, http.StatusInternalServerError, err)
 		return
 	}

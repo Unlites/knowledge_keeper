@@ -24,16 +24,16 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) err
 	var userInDb *models.User
 	result := ur.db.WithContext(ctx).First(&userInDb, "username = ?", user.Username)
 	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return &errs.ErrInternal{Message: fmt.Sprintf("failed to check user existence in db: %v", result.Error)}
+		return fmt.Errorf("failed to check user existence in db: %v", result.Error)
 	}
 
-	if userInDb != nil {
+	if result.RowsAffected != 0 {
 		return &errs.ErrAlreadyExists{Object: "user with username " + user.Username}
 	}
 
 	result = ur.db.WithContext(ctx).Create(user)
 	if result.Error != nil {
-		return &errs.ErrInternal{Message: fmt.Sprintf("failed to create user in db: %v", result.Error)}
+		return fmt.Errorf("failed to create user in db: %v", result.Error)
 	}
 
 	return nil

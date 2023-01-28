@@ -10,14 +10,6 @@ func (e ErrValidation) Error() string {
 	return fmt.Sprintf("validation error - %v", e.Message)
 }
 
-type ErrInternal struct {
-	Message string
-}
-
-func (e ErrInternal) Error() string {
-	return fmt.Sprintf("internal error - %v", e.Message)
-}
-
 type ErrNotFound struct {
 	Object string
 }

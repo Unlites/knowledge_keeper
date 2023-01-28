@@ -47,9 +47,9 @@ func (l *logger) Error(message string, err error, args ...interface{}) {
 
 func (l *logger) Fatal(message string, err error, args ...interface{}) {
 	if len(args) == 0 {
-		l.log.Fatal().Msg(err.Error())
+		l.log.Fatal().Msg(message + ": " + err.Error())
 	} else {
-		l.log.Fatal().Msgf(err.Error(), args...)
+		l.log.Fatal().Msgf(message+": "+err.Error(), args...)
 	}
 }
 
