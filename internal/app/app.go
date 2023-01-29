@@ -65,7 +65,7 @@ func Run() {
 	router := delivery.NewRouter()
 
 	handler := delivery.NewHandler(usecases, log, router)
-	handler.InitAPI(router)
+	handler.InitAPI()
 
 	httpServer := httpserver.NewHttpServer(&httpserver.Settings{
 		Port:           cfg.HttpServer.Port,

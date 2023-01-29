@@ -6,62 +6,46 @@ import (
 
 	"github.com/Unlites/knowledge_keeper/internal/dto"
 	"github.com/Unlites/knowledge_keeper/internal/errs"
-	"github.com/Unlites/knowledge_keeper/internal/usecases"
-	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
-type authHandler struct {
-	log         logger.Logger
-	group       *gin.RouterGroup
-	authUsecase usecases.Auth
+func (h *v1Handler) initAuthRoutes(authGroup *gin.RouterGroup) {
+	authGroup.POST("/sign_up", h.signUp)
+	authGroup.POST("/sign_in", h.signIn)
+	authGroup.POST("/sign_out", h.signOut)
+	authGroup.POST("/refresh", h.refresh)
 }
 
-func NewAuthHandler(log logger.Logger, group *gin.RouterGroup, authUsecase usecases.Auth) *authHandler {
-	return &authHandler{
-		log:         log,
-		group:       group,
-		authUsecase: authUsecase,
-	}
-}
-
-func (ah *authHandler) InitRoutes() {
-	ah.group.POST("/sign_up", ah.signUp)
-	ah.group.POST("/sign_in", ah.signIn)
-	ah.group.POST("/sign_out", ah.signOut)
-	ah.group.POST("/refresh", ah.refresh)
-}
-
-func (ah *authHandler) signUp(c *gin.Context) {
+func (h *v1Handler) signUp(c *gin.Context) {
 	var userDTO *dto.UserDTO
 	if err := c.BindJSON(&userDTO); err != nil {
-		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := ah.authUsecase.SignUp(c.Request.Context(), userDTO); err != nil {
+	if err := h.usecases.Auth.SignUp(c.Request.Context(), userDTO); err != nil {
 		var errAlreadyExists *errs.ErrAlreadyExists
 		if errors.As(err, &errAlreadyExists) {
-			newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+			h.newHttpErrorResponse(c, http.StatusBadRequest, err)
 			return
 		}
 
-		newHttpErrorResponse(c, ah.log, http.StatusInternalServerError, err)
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	newHttpSuccessResponse(c, "ok")
+	h.newHttpSuccessResponse(c, "ok")
 }
 
-func (ah *authHandler) signIn(c *gin.Context) {
+func (h *v1Handler) signIn(c *gin.Context) {
 	var userDTO *dto.UserDTO
 
 	if err := c.BindJSON(&userDTO); err != nil {
-		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
 		return
 	}
 
-	tokens, err := ah.authUsecase.SignIn(c.Request.Context(), userDTO)
+	tokens, err := h.usecases.Auth.SignIn(c.Request.Context(), userDTO)
 	if err != nil {
 		status := http.StatusInternalServerError
 
@@ -70,25 +54,25 @@ func (ah *authHandler) signIn(c *gin.Context) {
 			status = http.StatusUnauthorized
 		}
 
-		newHttpErrorResponse(c, ah.log, status, err)
+		h.newHttpErrorResponse(c, status, err)
 		return
 	}
 
-	newHttpSuccessResponse(c, tokens)
+	h.newHttpSuccessResponse(c, tokens)
 }
 
-func (ah *authHandler) signOut(c *gin.Context) {
+func (h *v1Handler) signOut(c *gin.Context) {
 
 }
 
-func (ah *authHandler) refresh(c *gin.Context) {
+func (h *v1Handler) refresh(c *gin.Context) {
 	var refreshToken *dto.RefreshTokenDTO
 	if err := c.BindJSON(&refreshToken); err != nil {
-		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
 		return
 	}
 
-	tokens, err := ah.authUsecase.RefreshTokens(c.Request.Context(), refreshToken)
+	tokens, err := h.usecases.Auth.RefreshTokens(c.Request.Context(), refreshToken)
 	if err != nil {
 		status := http.StatusInternalServerError
 
@@ -97,9 +81,9 @@ func (ah *authHandler) refresh(c *gin.Context) {
 			status = http.StatusUnauthorized
 		}
 
-		newHttpErrorResponse(c, ah.log, status, err)
+		h.newHttpErrorResponse(c, status, err)
 		return
 	}
 
-	newHttpSuccessResponse(c, tokens)
+	h.newHttpSuccessResponse(c, tokens)
 }

@@ -3,7 +3,6 @@ package v1
 import (
 	"net/http"
 
-	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +12,7 @@ type httpResponse struct {
 	Data   interface{} `json:"data"`
 }
 
-func newHttpSuccessResponse(c *gin.Context, data interface{}) {
+func (h *v1Handler) newHttpSuccessResponse(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, httpResponse{
 		Status: "success",
 		Code:   http.StatusOK,
@@ -21,8 +20,8 @@ func newHttpSuccessResponse(c *gin.Context, data interface{}) {
 	})
 }
 
-func newHttpErrorResponse(c *gin.Context, log logger.Logger, code int, err error) {
-	log.Error("", err)
+func (h *v1Handler) newHttpErrorResponse(c *gin.Context, code int, err error) {
+	h.log.Error("", err)
 	c.AbortWithStatusJSON(code, httpResponse{
 		Status: "error",
 		Code:   code,
