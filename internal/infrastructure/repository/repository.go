@@ -9,6 +9,9 @@ import (
 
 type User interface {
 	CreateUser(ctx context.Context, user *models.User) error
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
+	GetUserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error)
+	UpdateUser(ctx context.Context, user *models.User) error
 }
 
 type Record interface {

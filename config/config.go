@@ -24,13 +24,15 @@ type Postgres struct {
 }
 
 type Auth struct {
-	SigningKey      string `env:"AUTH_SIGHNING_KEY env-required"`
-	AccessTokenTTL  string `env:"AUTH_ACCESS_TOKEN_TTL env-required"`
-	RefreshTokenTTL string `env:"AUTH_REFRESH_TOKEN_TTL env-required"`
+	SigningKey      string        `env:"AUTH_SIGHNING_KEY" env-required:"true"`
+	AccessTokenTTL  time.Duration `env:"AUTH_ACCESS_TOKEN_TTL" env-required:"true"`
+	RefreshTokenTTL time.Duration `env:"AUTH_REFRESH_TOKEN_TTL" env-required:"true"`
+	HasherCost      int           `env:"AUTH_HASHER_COST" env-default:"10"`
 }
 type Config struct {
 	HttpServer HttpServer
 	Postgres   Postgres
+	Auth       Auth
 }
 
 func Init() (*Config, error) {

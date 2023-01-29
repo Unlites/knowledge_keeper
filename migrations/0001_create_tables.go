@@ -7,14 +7,16 @@ import (
 )
 
 func init() {
-	goose.AddMigration(up, down)
+	goose.AddMigration(up0001, down0001)
 }
 
-func up(tx *sql.Tx) error {
+func up0001(tx *sql.Tx) error {
 	query := `CREATE TABLE IF NOT EXISTS users (
 		id SERIAL PRIMARY KEY,
-		username VARCHAR(20),
-		password_hash VARCHAR(255)
+		username VARCHAR(20) NOT NULL UNIQUE,
+		password_hash VARCHAR(255) NOT NULL,
+		refresh_token VARCHAR(255),
+		token_expires_at INTEGER
 	);`
 	_, err := tx.Exec(query)
 	if err != nil {
@@ -24,7 +26,7 @@ func up(tx *sql.Tx) error {
 	return nil
 }
 
-func down(tx *sql.Tx) error {
+func down0001(tx *sql.Tx) error {
 	query := "DROP TABLE users;"
 	_, err := tx.Exec(query)
 	if err != nil {

@@ -13,6 +13,7 @@ import (
 	"github.com/Unlites/knowledge_keeper/internal/infrastructure/repository"
 	"github.com/Unlites/knowledge_keeper/internal/usecases"
 	_ "github.com/Unlites/knowledge_keeper/migrations"
+	"github.com/Unlites/knowledge_keeper/pkg/auth"
 	"github.com/Unlites/knowledge_keeper/pkg/httpserver"
 	"github.com/Unlites/knowledge_keeper/pkg/logger"
 	"github.com/Unlites/knowledge_keeper/pkg/postgres"
@@ -48,8 +49,18 @@ func Run() {
 		log.Fatal("failed to make migrations", err)
 	}
 
+	tokenManager := auth.NewTokenManager(&auth.TokenManagerSettings{
+		SigningKey:      cfg.Auth.SigningKey,
+		AccessTokenTTL:  cfg.Auth.AccessTokenTTL,
+		RefreshTokenTTL: cfg.Auth.RefreshTokenTTL,
+	})
+
+	passwordHasher := auth.NewPasswordHasher(&auth.PasswordHasherSettings{
+		Cost: cfg.Auth.HasherCost,
+	})
+
 	repo := repository.NewRepository(db)
-	usecases := usecases.NewUsecases(repo)
+	usecases := usecases.NewUsecases(repo, tokenManager, passwordHasher)
 
 	router := delivery.NewRouter()
 

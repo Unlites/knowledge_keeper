@@ -54,7 +54,27 @@ func (ah *authHandler) signUp(c *gin.Context) {
 }
 
 func (ah *authHandler) signIn(c *gin.Context) {
+	var userDTO *dto.UserDTO
 
+	if err := c.BindJSON(&userDTO); err != nil {
+		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		return
+	}
+
+	tokens, err := ah.authUsecase.SignIn(c.Request.Context(), userDTO)
+	if err != nil {
+		status := http.StatusInternalServerError
+
+		var errNotFound *errs.ErrNotFound
+		if errors.As(err, &errNotFound) || errors.Is(err, errs.ErrIncorrectPassword) {
+			status = http.StatusUnauthorized
+		}
+
+		newHttpErrorResponse(c, ah.log, status, err)
+		return
+	}
+
+	newHttpSuccessResponse(c, tokens)
 }
 
 func (ah *authHandler) signOut(c *gin.Context) {
@@ -62,5 +82,24 @@ func (ah *authHandler) signOut(c *gin.Context) {
 }
 
 func (ah *authHandler) refresh(c *gin.Context) {
+	var refreshToken *dto.RefreshTokenDTO
+	if err := c.BindJSON(&refreshToken); err != nil {
+		newHttpErrorResponse(c, ah.log, http.StatusBadRequest, err)
+		return
+	}
 
+	tokens, err := ah.authUsecase.RefreshTokens(c.Request.Context(), refreshToken)
+	if err != nil {
+		status := http.StatusInternalServerError
+
+		var errNotFound *errs.ErrNotFound
+		if errors.As(err, &errNotFound) || errors.Is(err, errs.ErrRefreshTokenExpired) {
+			status = http.StatusUnauthorized
+		}
+
+		newHttpErrorResponse(c, ah.log, status, err)
+		return
+	}
+
+	newHttpSuccessResponse(c, tokens)
 }
