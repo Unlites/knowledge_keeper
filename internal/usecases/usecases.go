@@ -17,6 +17,7 @@ type Auth interface {
 }
 
 type Record interface {
+	CreateRecord(ctx context.Context, userId uint, record *dto.RecordDTORequest) error
 }
 
 type Usecases struct {

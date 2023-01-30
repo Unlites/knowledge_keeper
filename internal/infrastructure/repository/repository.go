@@ -15,6 +15,7 @@ type User interface {
 }
 
 type Record interface {
+	CreateRecord(ctx context.Context, userId uint, record *models.Record) error
 }
 
 type Repository struct {

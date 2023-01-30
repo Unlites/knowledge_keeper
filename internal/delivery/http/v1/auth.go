@@ -23,6 +23,11 @@ func (h *v1Handler) signUp(c *gin.Context) {
 		return
 	}
 
+	if err := userDTO.Validate(); err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, &errs.ErrValidation{Message: err.Error()})
+		return
+	}
+
 	if err := h.usecases.Auth.SignUp(c.Request.Context(), userDTO); err != nil {
 		var errAlreadyExists *errs.ErrAlreadyExists
 		if errors.As(err, &errAlreadyExists) {
@@ -42,6 +47,11 @@ func (h *v1Handler) signIn(c *gin.Context) {
 
 	if err := c.BindJSON(&userDTO); err != nil {
 		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := userDTO.Validate(); err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, &errs.ErrValidation{Message: err.Error()})
 		return
 	}
 
@@ -68,6 +78,11 @@ func (h *v1Handler) signOut(c *gin.Context) {
 		return
 	}
 
+	if err := refreshToken.Validate(); err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, &errs.ErrValidation{Message: err.Error()})
+		return
+	}
+
 	if err := h.usecases.Auth.SignOut(c.Request.Context(), refreshToken); err != nil {
 		h.newHttpErrorResponse(c, http.StatusInternalServerError, err)
 		return
@@ -80,6 +95,11 @@ func (h *v1Handler) refresh(c *gin.Context) {
 	var refreshToken *dto.RefreshTokenDTO
 	if err := c.BindJSON(&refreshToken); err != nil {
 		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := refreshToken.Validate(); err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, &errs.ErrValidation{Message: err.Error()})
 		return
 	}
 

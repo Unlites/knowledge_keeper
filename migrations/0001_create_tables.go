@@ -17,7 +17,15 @@ func up0001(tx *sql.Tx) error {
 		password_hash VARCHAR(255) NOT NULL,
 		refresh_token VARCHAR(255),
 		token_expires_at INTEGER
-	);`
+	);
+	CREATE TABLE IF NOT EXISTS records (
+		id SERIAL PRIMARY KEY,
+		topic VARCHAR(100) NOT NULL,
+		title VARCHAR(255) NOT NULL,
+		content TEXT NOT NULL,
+		user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL
+	);
+	`
 	_, err := tx.Exec(query)
 	if err != nil {
 		return err
@@ -27,7 +35,8 @@ func up0001(tx *sql.Tx) error {
 }
 
 func down0001(tx *sql.Tx) error {
-	query := "DROP TABLE users;"
+	query := `DROP TABLE records;
+	DROP TABLE users;`
 	_, err := tx.Exec(query)
 	if err != nil {
 		return err
