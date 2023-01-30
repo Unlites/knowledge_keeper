@@ -1,9 +1,9 @@
 package models
 
 type Record struct {
-	Id      uint32
+	Id      uint
 	Topic   string
 	Title   string
 	Content string
-	UserId  uint32
+	UserId  uint
 }

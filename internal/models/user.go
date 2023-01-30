@@ -1,7 +1,7 @@
 package models
 
 type User struct {
-	Id             uint32
+	Id             uint
 	Username       string
 	PasswordHash   []byte
 	RefreshToken   string

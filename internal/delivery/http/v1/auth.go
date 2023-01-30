@@ -62,7 +62,18 @@ func (h *v1Handler) signIn(c *gin.Context) {
 }
 
 func (h *v1Handler) signOut(c *gin.Context) {
+	var refreshToken *dto.RefreshTokenDTO
+	if err := c.BindJSON(&refreshToken); err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, err)
+		return
+	}
 
+	if err := h.usecases.Auth.SignOut(c.Request.Context(), refreshToken); err != nil {
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	h.newHttpSuccessResponse(c, "ok")
 }
 
 func (h *v1Handler) refresh(c *gin.Context) {

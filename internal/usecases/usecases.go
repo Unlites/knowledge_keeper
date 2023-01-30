@@ -11,7 +11,9 @@ import (
 type Auth interface {
 	SignUp(ctx context.Context, userDTO *dto.UserDTO) error
 	SignIn(ctx context.Context, userDTO *dto.UserDTO) (*dto.TokensDTO, error)
+	SignOut(ctx context.Context, refreshToken *dto.RefreshTokenDTO) error
 	RefreshTokens(ctx context.Context, refreshToken *dto.RefreshTokenDTO) (*dto.TokensDTO, error)
+	ParseUserIdFromAccessToken(ctx context.Context, accessToken string) (string, error)
 }
 
 type Record interface {

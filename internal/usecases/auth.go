@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/Unlites/knowledge_keeper/internal/dto"
@@ -53,6 +54,18 @@ func (au *authUsecase) SignIn(ctx context.Context, userDTO *dto.UserDTO) (*dto.T
 	return au.updateUserTokens(ctx, user)
 }
 
+func (au *authUsecase) SignOut(ctx context.Context, refreshToken *dto.RefreshTokenDTO) error {
+	user, err := au.userRepo.GetUserByRefreshToken(ctx, refreshToken.Token)
+	if err != nil {
+		return err
+	}
+
+	user.RefreshToken = ""
+	user.TokenExpiresAt = 0
+
+	return au.userRepo.UpdateUser(ctx, user)
+}
+
 func (au *authUsecase) RefreshTokens(ctx context.Context, refreshToken *dto.RefreshTokenDTO) (*dto.TokensDTO, error) {
 	user, err := au.userRepo.GetUserByRefreshToken(ctx, refreshToken.Token)
 	if err != nil {
@@ -66,8 +79,12 @@ func (au *authUsecase) RefreshTokens(ctx context.Context, refreshToken *dto.Refr
 	return au.updateUserTokens(ctx, user)
 }
 
+func (au *authUsecase) ParseUserIdFromAccessToken(ctx context.Context, accessToken string) (string, error) {
+	return au.tokenManager.ParseUserIdFromAccessToken(accessToken)
+}
+
 func (au *authUsecase) updateUserTokens(ctx context.Context, user *models.User) (*dto.TokensDTO, error) {
-	accessToken, err := au.tokenManager.NewAccessToken(string(rune(user.Id)))
+	accessToken, err := au.tokenManager.NewAccessToken(strconv.Itoa(int(user.Id)))
 	if err != nil {
 		return nil, err
 	}

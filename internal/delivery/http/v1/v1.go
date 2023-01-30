@@ -24,7 +24,7 @@ func (h *v1Handler) Init() {
 	h.v1Group.Use(h.addLoggerRequestId)
 
 	authGroup := h.v1Group.Group("/auth")
-	recordGroup := h.v1Group.Group("/record", h.addLoggerUserId)
+	recordGroup := h.v1Group.Group("/record", h.userIdentification, h.addLoggerUserId)
 
 	h.initAuthRoutes(authGroup)
 	h.initRecordRoutes(recordGroup)
