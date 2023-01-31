@@ -26,7 +26,7 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) err
 		if strings.Contains(err.Error(), "duplicate") {
 			return &errs.ErrAlreadyExists{Object: "user with username " + user.Username}
 		}
-		return fmt.Errorf("failed to create user in db: %v", err)
+		return fmt.Errorf("failed to create user in db - %w", err)
 	}
 
 	return nil
@@ -38,7 +38,7 @@ func (ur *userRepository) GetUserByUsername(ctx context.Context, username string
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errs.ErrNotFound{Object: "user with username " + username}
 		}
-		return nil, fmt.Errorf("failed to get user by username in db: %v", err)
+		return nil, fmt.Errorf("failed to get user by username from db - %w", err)
 	}
 
 	return user, nil
@@ -46,11 +46,11 @@ func (ur *userRepository) GetUserByUsername(ctx context.Context, username string
 
 func (ur *userRepository) GetUserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error) {
 	var user *models.User
-	if err := ur.db.WithContext(ctx).First(&user, "refresh_token", refreshToken).Error; err != nil {
+	if err := ur.db.WithContext(ctx).First(&user, "refresh_token = ?", refreshToken).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errs.ErrNotFound{Object: "user with such refresh_token"}
 		}
-		return nil, fmt.Errorf("failed to get user by refresh_token in db: %v", err)
+		return nil, fmt.Errorf("failed to get user by refresh_token from db - %w", err)
 	}
 
 	return user, nil

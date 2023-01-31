@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Unlites/knowledge_keeper/internal/dto"
 	"github.com/Unlites/knowledge_keeper/internal/infrastructure/repository"
@@ -26,5 +27,32 @@ func (ru *recordUsecase) CreateRecord(ctx context.Context, userId uint, recordDT
 		UserId:  userId,
 	}
 
-	return ru.recordRepo.CreateRecord(ctx, userId, record)
+	if err := ru.recordRepo.CreateRecord(ctx, userId, record); err != nil {
+		return fmt.Errorf("failed to create record - %w", err)
+	}
+
+	return nil
+}
+
+func (ru *recordUsecase) GetRecordById(ctx context.Context, userId uint, id uint) (*dto.RecordDTOResponse, error) {
+	record, err := ru.recordRepo.GetRecordById(ctx, userId, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get record by id - %w", err)
+	}
+
+	return &dto.RecordDTOResponse{
+		Id:      record.Id,
+		Topic:   record.Topic,
+		Title:   record.Title,
+		Content: record.Content,
+	}, nil
+}
+
+func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, offset, limit int) ([]*dto.RecordDTOResponse, error) {
+	return nil, nil
+}
+
+func (ru *recordUsecase) GetAllRecordsByTopic(ctx context.Context, userId uint,
+	topic string, offset, limit int) ([]*dto.RecordDTOResponse, error) {
+	return nil, nil
 }

@@ -3,7 +3,6 @@ package v1
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gin-contrib/requestid"
@@ -44,13 +43,4 @@ func (h *v1Handler) userIdentification(c *gin.Context) {
 	}
 
 	c.Set("userId", userId)
-}
-
-func (h *v1Handler) getUserId(c *gin.Context) (uint, error) {
-	userId, err := strconv.ParseUint(c.GetString("userId"), 10, 64)
-	if err != nil {
-		return 0, err
-	}
-
-	return uint(userId), nil
 }
