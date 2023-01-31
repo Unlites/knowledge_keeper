@@ -57,5 +57,9 @@ func (ur *userRepository) GetUserByRefreshToken(ctx context.Context, refreshToke
 }
 
 func (ur *userRepository) UpdateUser(ctx context.Context, user *models.User) error {
-	return ur.db.WithContext(ctx).Save(user).Error
+	if err := ur.db.WithContext(ctx).Save(user).Error; err != nil {
+		return fmt.Errorf("failed to update user in db - %w", err)
+	}
+
+	return nil
 }
