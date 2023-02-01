@@ -48,11 +48,27 @@ func (ru *recordUsecase) GetRecordById(ctx context.Context, userId uint, id uint
 	}, nil
 }
 
-func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, offset, limit int) ([]*dto.RecordDTOResponse, error) {
-	return nil, nil
+func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, topic string,
+	offset, limit int) ([]*dto.RecordDTOResponse, error) {
+
+	records, err := ru.recordRepo.GetAllRecords(ctx, userId, topic, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all records - %v", err)
+	}
+
+	recordDTOs := make([]*dto.RecordDTOResponse, 0)
+	for _, record := range records {
+		recordDTOs = append(recordDTOs, toDTO(record))
+	}
+
+	return recordDTOs, nil
 }
 
-func (ru *recordUsecase) GetAllRecordsByTopic(ctx context.Context, userId uint,
-	topic string, offset, limit int) ([]*dto.RecordDTOResponse, error) {
-	return nil, nil
+func toDTO(record *models.Record) *dto.RecordDTOResponse {
+	return &dto.RecordDTOResponse{
+		Id:      record.Id,
+		Topic:   record.Topic,
+		Title:   record.Content,
+		Content: record.Content,
+	}
 }

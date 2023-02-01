@@ -19,8 +19,7 @@ type Auth interface {
 type Record interface {
 	CreateRecord(ctx context.Context, userId uint, record *dto.RecordDTORequest) error
 	GetRecordById(ctx context.Context, userId uint, id uint) (*dto.RecordDTOResponse, error)
-	GetAllRecords(ctx context.Context, userId uint, offset, limit int) ([]*dto.RecordDTOResponse, error)
-	GetAllRecordsByTopic(ctx context.Context, userId uint, topic string, offset, limit int) ([]*dto.RecordDTOResponse, error)
+	GetAllRecords(ctx context.Context, userId uint, topic string, offset, limit int) ([]*dto.RecordDTOResponse, error)
 }
 
 type Usecases struct {

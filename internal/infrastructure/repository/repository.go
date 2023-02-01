@@ -17,8 +17,7 @@ type User interface {
 type Record interface {
 	CreateRecord(ctx context.Context, userId uint, record *models.Record) error
 	GetRecordById(ctx context.Context, userId uint, id uint) (*models.Record, error)
-	GetAllRecords(ctx context.Context, userId uint, offset, limit int) ([]*models.Record, error)
-	GetAllRecordsByTopic(ctx context.Context, userId uint, topic string, offset, limit int) ([]*models.Record, error)
+	GetAllRecords(ctx context.Context, userId uint, topic string, offset, limit int) ([]*models.Record, error)
 }
 
 type Repository struct {

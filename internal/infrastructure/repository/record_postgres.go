@@ -39,10 +39,18 @@ func (r *recordRepository) GetRecordById(ctx context.Context, userId uint, id ui
 
 	return record, nil
 }
-func (r *recordRepository) GetAllRecords(ctx context.Context, userId uint, offset, limit int) ([]*models.Record, error) {
-	return nil, nil
-}
-func (r *recordRepository) GetAllRecordsByTopic(ctx context.Context, userId uint,
+
+func (r *recordRepository) GetAllRecords(ctx context.Context, userId uint,
 	topic string, offset, limit int) ([]*models.Record, error) {
-	return nil, nil
+
+	condition := map[string]interface{}{"user_id": userId}
+	if topic != "" {
+		condition["topic"] = topic
+	}
+
+	records := make([]*models.Record, 0)
+	if err := r.db.Limit(limit).Offset(offset).Where(condition).Find(&records).Error; err != nil {
+		return nil, fmt.Errorf("failed to get records from db - %w", err)
+	}
+	return records, nil
 }
