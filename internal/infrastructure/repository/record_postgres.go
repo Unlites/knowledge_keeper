@@ -49,8 +49,17 @@ func (r *recordRepository) GetAllRecords(ctx context.Context, userId uint,
 	}
 
 	records := make([]*models.Record, 0)
-	if err := r.db.Limit(limit).Offset(offset).Where(condition).Find(&records).Error; err != nil {
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Where(condition).Find(&records).Error; err != nil {
 		return nil, fmt.Errorf("failed to get records from db - %w", err)
 	}
 	return records, nil
+}
+
+func (r *recordRepository) GetAllTopics(ctx context.Context, userId uint) ([]string, error) {
+	topics := make([]string, 0)
+	if err := r.db.WithContext(ctx).Model(&models.Record{}).Distinct("topic").Find(&topics).Error; err != nil {
+		return nil, fmt.Errorf("failed to get topics from db - %w", err)
+	}
+
+	return topics, nil
 }

@@ -64,6 +64,15 @@ func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, topic s
 	return recordDTOs, nil
 }
 
+func (ru *recordUsecase) GetAllTopics(ctx context.Context, userId uint) ([]string, error) {
+	topics, err := ru.recordRepo.GetAllTopics(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all topics")
+	}
+
+	return topics, nil
+}
+
 func toDTO(record *models.Record) *dto.RecordDTOResponse {
 	return &dto.RecordDTOResponse{
 		Id:      record.Id,

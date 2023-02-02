@@ -14,6 +14,7 @@ func (h *v1Handler) initRecordRoutes(recordGroup *gin.RouterGroup) {
 	recordGroup.POST("", h.createRecord)
 	recordGroup.GET("/:id", h.getRecordById)
 	recordGroup.GET("", h.getAllRecords)
+	recordGroup.GET("/topics", h.getAllTopics)
 }
 
 func (h *v1Handler) createRecord(c *gin.Context) {
@@ -94,4 +95,20 @@ func (h *v1Handler) getAllRecords(c *gin.Context) {
 	}
 
 	h.newHttpSuccessResponse(c, recordDTOs)
+}
+
+func (h *v1Handler) getAllTopics(c *gin.Context) {
+	userId, err := h.getUserId(c)
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("failed to get user id - %w", err))
+		return
+	}
+
+	topics, err := h.usecases.GetAllTopics(c, userId)
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("get all topics error - %w", err))
+		return
+	}
+
+	h.newHttpSuccessResponse(c, topics)
 }
