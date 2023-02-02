@@ -23,13 +23,3 @@ func (h *v1Handler) getIdParam(c *gin.Context) (uint, error) {
 
 	return uint(id), nil
 }
-
-func (h *v1Handler) getIntQueryParam(c *gin.Context, key string) (int, error) {
-	valueStr := c.DefaultQuery(key, "0")
-	valueInt, err := strconv.Atoi(valueStr)
-	if err != nil {
-		return 0, err
-	}
-
-	return valueInt, nil
-}

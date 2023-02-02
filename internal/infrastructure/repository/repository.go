@@ -19,6 +19,7 @@ type Record interface {
 	GetRecordById(ctx context.Context, userId uint, id uint) (*models.Record, error)
 	GetAllRecords(ctx context.Context, userId uint, topic string, offset, limit int) ([]*models.Record, error)
 	GetAllTopics(ctx context.Context, userId uint) ([]string, error)
+	SearchRecordsByTitle(ctx context.Context, userId uint, title string, offset, limit int) ([]*models.Record, error)
 }
 
 type Repository struct {

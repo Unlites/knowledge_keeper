@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Unlites/knowledge_keeper/internal/dto"
 	"github.com/Unlites/knowledge_keeper/internal/errs"
@@ -15,6 +16,7 @@ func (h *v1Handler) initRecordRoutes(recordGroup *gin.RouterGroup) {
 	recordGroup.GET("/:id", h.getRecordById)
 	recordGroup.GET("", h.getAllRecords)
 	recordGroup.GET("/topics", h.getAllTopics)
+	recordGroup.GET("/search", h.searchRecordsByTitle)
 }
 
 func (h *v1Handler) createRecord(c *gin.Context) {
@@ -72,14 +74,14 @@ func (h *v1Handler) getRecordById(c *gin.Context) {
 
 func (h *v1Handler) getAllRecords(c *gin.Context) {
 	topic := c.DefaultQuery("topic", "")
-	offset, err := h.getIntQueryParam(c, "offset")
+	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
 	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid offset param - %w", err))
+		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'offset' must be integer"))
 		return
 	}
-	limit, err := h.getIntQueryParam(c, "limit")
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid limit param - %w", err))
+		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'limit' must be integer"))
 		return
 	}
 	userId, err := h.getUserId(c)
@@ -111,4 +113,35 @@ func (h *v1Handler) getAllTopics(c *gin.Context) {
 	}
 
 	h.newHttpSuccessResponse(c, topics)
+}
+
+func (h *v1Handler) searchRecordsByTitle(c *gin.Context) {
+	title, exists := c.GetQuery("title")
+	if !exists || title == "" {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - missing 'title'"))
+		return
+	}
+	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'offset' must be integer"))
+		return
+	}
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'limit' must be integer"))
+		return
+	}
+	userId, err := h.getUserId(c)
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("failed to get user id - %w", err))
+		return
+	}
+
+	recordDTOs, err := h.usecases.Record.SearchRecordsByTitle(c.Request.Context(), userId, title, offset, limit)
+	if err != nil {
+		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("search records by title error - %w", err))
+		return
+	}
+
+	h.newHttpSuccessResponse(c, recordDTOs)
 }

@@ -63,3 +63,16 @@ func (r *recordRepository) GetAllTopics(ctx context.Context, userId uint) ([]str
 
 	return topics, nil
 }
+
+func (r *recordRepository) SearchRecordsByTitle(ctx context.Context,
+	userId uint, title string, offset, limit int) ([]*models.Record, error) {
+
+	records := make([]*models.Record, 0)
+
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).
+		Where("title iLIKE ?", "%"+title+"%").Find(&records).Error; err != nil {
+		return nil, fmt.Errorf("failed to get records from db - %w", err)
+	}
+
+	return records, nil
+}
