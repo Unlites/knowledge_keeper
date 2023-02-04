@@ -93,7 +93,7 @@ func toDTO(record *models.Record) *dto.RecordDTOResponse {
 	return &dto.RecordDTOResponse{
 		Id:      record.Id,
 		Topic:   record.Topic,
-		Title:   record.Content,
+		Title:   record.Title,
 		Content: record.Content,
 	}
 }
