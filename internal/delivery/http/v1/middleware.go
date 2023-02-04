@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -38,7 +39,7 @@ func (h *v1Handler) userIdentification(c *gin.Context) {
 
 	userId, err := h.usecases.Auth.ParseUserIdFromAccessToken(c.Request.Context(), authHeaderParts[1])
 	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusUnauthorized, err)
+		h.newHttpErrorResponse(c, http.StatusUnauthorized, fmt.Errorf("parse access token error: %w", err))
 		return
 	}
 
