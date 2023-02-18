@@ -13,6 +13,8 @@ services:
     volumes:
       - .:/app
     restart: always
+    networks:
+      - knowledge_keeper_network
   
   db:
     container_name: postgres
@@ -26,7 +28,11 @@ services:
     volumes:
       - ./.db_data/postgres/:/var/lib/postgresql/data
       - .:/docker-entrypoint-initdb.d
+    networks:
+      - knowledge_keeper_network
     restart: always
-      
-
+    
+networks:
+  knowledge_keeper_network:
+    name: knowledge_keeper_network
 
