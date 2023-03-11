@@ -16,7 +16,6 @@ func (h *v1Handler) initRecordRoutes(recordGroup *gin.RouterGroup) {
 	recordGroup.GET("/:id", h.getRecordById)
 	recordGroup.GET("", h.getAllRecords)
 	recordGroup.GET("/topics", h.getAllTopics)
-	recordGroup.GET("/search", h.searchRecordsByTitle)
 }
 
 func (h *v1Handler) createRecord(c *gin.Context) {
@@ -74,6 +73,7 @@ func (h *v1Handler) getRecordById(c *gin.Context) {
 
 func (h *v1Handler) getAllRecords(c *gin.Context) {
 	topic := c.DefaultQuery("topic", "")
+	title := c.DefaultQuery("title", "")
 	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
 	if err != nil {
 		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'offset' must be integer"))
@@ -90,7 +90,7 @@ func (h *v1Handler) getAllRecords(c *gin.Context) {
 		return
 	}
 
-	recordDTOs, err := h.usecases.Record.GetAllRecords(c.Request.Context(), userId, topic, offset, limit)
+	recordDTOs, err := h.usecases.Record.GetAllRecords(c.Request.Context(), userId, topic, title, offset, limit)
 	if err != nil {
 		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("get all records error - %w", err))
 		return
@@ -113,35 +113,4 @@ func (h *v1Handler) getAllTopics(c *gin.Context) {
 	}
 
 	h.newHttpSuccessResponse(c, topics)
-}
-
-func (h *v1Handler) searchRecordsByTitle(c *gin.Context) {
-	title, exists := c.GetQuery("title")
-	if !exists || title == "" {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - missing 'title'"))
-		return
-	}
-	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
-	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'offset' must be integer"))
-		return
-	}
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, errors.New("query param error - 'limit' must be integer"))
-		return
-	}
-	userId, err := h.getUserId(c)
-	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("failed to get user id - %w", err))
-		return
-	}
-
-	recordDTOs, err := h.usecases.Record.SearchRecordsByTitle(c.Request.Context(), userId, title, offset, limit)
-	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("search records by title error - %w", err))
-		return
-	}
-
-	h.newHttpSuccessResponse(c, recordDTOs)
 }

@@ -48,10 +48,10 @@ func (ru *recordUsecase) GetRecordById(ctx context.Context, userId uint, id uint
 	}, nil
 }
 
-func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, topic string,
+func (ru *recordUsecase) GetAllRecords(ctx context.Context, userId uint, topic, title string,
 	offset, limit int) ([]*dto.RecordDTOResponse, error) {
 
-	records, err := ru.recordRepo.GetAllRecords(ctx, userId, topic, offset, limit)
+	records, err := ru.recordRepo.GetAllRecords(ctx, userId, topic, title, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all records - %w", err)
 	}
@@ -71,22 +71,6 @@ func (ru *recordUsecase) GetAllTopics(ctx context.Context, userId uint) ([]strin
 	}
 
 	return topics, nil
-}
-
-func (ru *recordUsecase) SearchRecordsByTitle(ctx context.Context,
-	userId uint, title string, offset, limit int) ([]*dto.RecordDTOResponse, error) {
-
-	records, err := ru.recordRepo.SearchRecordsByTitle(ctx, userId, title, offset, limit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to search records by title - %w", err)
-	}
-
-	recordDTOs := make([]*dto.RecordDTOResponse, 0)
-	for _, record := range records {
-		recordDTOs = append(recordDTOs, toDTO(record))
-	}
-
-	return recordDTOs, nil
 }
 
 func toDTO(record *models.Record) *dto.RecordDTOResponse {

@@ -20,7 +20,9 @@ func newRecordRepository(db *gorm.DB) *recordRepository {
 	}
 }
 
-func (r *recordRepository) CreateRecord(ctx context.Context, userId uint, record *models.Record) error {
+func (r *recordRepository) CreateRecord(ctx context.Context, userId uint,
+	record *models.Record) error {
+
 	if err := r.db.WithContext(ctx).Create(record).Error; err != nil {
 		return fmt.Errorf("failed to create user in db - %w", err)
 	}
@@ -28,9 +30,13 @@ func (r *recordRepository) CreateRecord(ctx context.Context, userId uint, record
 	return nil
 }
 
-func (r *recordRepository) GetRecordById(ctx context.Context, userId uint, id uint) (*models.Record, error) {
+func (r *recordRepository) GetRecordById(ctx context.Context, userId uint,
+	id uint) (*models.Record, error) {
+
 	var record *models.Record
-	if err := r.db.WithContext(ctx).First(&record, "user_id = ? AND id = ?", userId, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).First(&record, "user_id = ? AND id = ?",
+		userId, id).Error; err != nil {
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errs.ErrNotFound{Object: "record"}
 		}
@@ -41,38 +47,34 @@ func (r *recordRepository) GetRecordById(ctx context.Context, userId uint, id ui
 }
 
 func (r *recordRepository) GetAllRecords(ctx context.Context, userId uint,
-	topic string, offset, limit int) ([]*models.Record, error) {
+	topic, title string, offset, limit int) ([]*models.Record, error) {
 
-	condition := map[string]interface{}{"user_id": userId}
+	condition := r.db.Where("user_id = ?", userId)
 	if topic != "" {
-		condition["topic"] = topic
+		condition = condition.Where("topic = ?", topic)
+	}
+	if title != "" {
+		condition = condition.Where("title iLIKE ?", "%"+title+"%")
 	}
 
 	records := make([]*models.Record, 0)
-	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Where(condition).Find(&records).Error; err != nil {
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).
+		Where(condition).Find(&records).Error; err != nil {
+
 		return nil, fmt.Errorf("failed to get records from db - %w", err)
 	}
 	return records, nil
 }
 
-func (r *recordRepository) GetAllTopics(ctx context.Context, userId uint) ([]string, error) {
+func (r *recordRepository) GetAllTopics(ctx context.Context,
+	userId uint) ([]string, error) {
+
 	topics := make([]string, 0)
-	if err := r.db.WithContext(ctx).Model(&models.Record{}).Distinct("topic").Find(&topics).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&models.Record{}).Distinct("topic").
+		Find(&topics).Error; err != nil {
+
 		return nil, fmt.Errorf("failed to get topics from db - %w", err)
 	}
 
 	return topics, nil
-}
-
-func (r *recordRepository) SearchRecordsByTitle(ctx context.Context,
-	userId uint, title string, offset, limit int) ([]*models.Record, error) {
-
-	records := make([]*models.Record, 0)
-
-	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).
-		Where("title iLIKE ?", "%"+title+"%").Find(&records).Error; err != nil {
-		return nil, fmt.Errorf("failed to get records from db - %w", err)
-	}
-
-	return records, nil
 }
