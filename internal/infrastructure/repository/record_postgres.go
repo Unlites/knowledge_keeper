@@ -59,7 +59,7 @@ func (r *recordRepository) GetAllRecords(ctx context.Context, userId uint,
 
 	records := make([]*models.Record, 0)
 	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).
-		Where(condition).Find(&records).Error; err != nil {
+		Where(condition).Order("id desc").Find(&records).Error; err != nil {
 
 		return nil, fmt.Errorf("failed to get records from db - %w", err)
 	}
