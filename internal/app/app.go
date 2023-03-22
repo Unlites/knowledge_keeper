@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/Unlites/knowledge_keeper/config"
@@ -62,7 +63,11 @@ func Run() {
 	repo := repository.NewRepository(db)
 	usecases := usecases.NewUsecases(repo, tokenManager, passwordHasher)
 
-	router := delivery.NewRouter()
+	allowedOrigins := make([]string, 0)
+	for _, origin := range strings.Split(cfg.HttpServer.AllowedOriginsStr, " ") {
+		allowedOrigins = append(allowedOrigins, origin)
+	}
+	router := delivery.NewRouter(allowedOrigins)
 
 	handler := delivery.NewHandler(usecases, log, router)
 	handler.InitAPI()
