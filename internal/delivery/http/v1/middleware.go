@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
@@ -44,4 +45,10 @@ func (h *v1Handler) userIdentification(c *gin.Context) {
 	}
 
 	c.Set("userId", userId)
+}
+
+func (h *v1Handler) metrics(c *gin.Context) {
+	start := time.Now()
+	c.Next()
+	observeRequest(time.Since(start), c.Writer.Status())
 }

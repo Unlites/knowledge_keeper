@@ -6,6 +6,7 @@ services:
     build: ./
     ports:
       - 8000:8000
+      - 9000:9000
     depends_on:
       - db
     env_file:
@@ -33,11 +34,14 @@ services:
     restart: always
 
   prometheus:
+    container_name: prometheus
     image: prom/prometheus:v2.43.0
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
+    networks:
+     - knowledge_keeper_network
 
 networks:
   knowledge_keeper_network:

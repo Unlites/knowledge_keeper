@@ -17,6 +17,7 @@ import (
 	"github.com/Unlites/knowledge_keeper/pkg/auth"
 	"github.com/Unlites/knowledge_keeper/pkg/httpserver"
 	"github.com/Unlites/knowledge_keeper/pkg/logger"
+	"github.com/Unlites/knowledge_keeper/pkg/metrics"
 	"github.com/Unlites/knowledge_keeper/pkg/postgres"
 	"github.com/pressly/goose"
 )
@@ -63,11 +64,7 @@ func Run() {
 	repo := repository.NewRepository(db)
 	usecases := usecases.NewUsecases(repo, tokenManager, passwordHasher)
 
-	allowedOrigins := make([]string, 0)
-	for _, origin := range strings.Split(cfg.HttpServer.AllowedOriginsStr, " ") {
-		allowedOrigins = append(allowedOrigins, origin)
-	}
-	router := delivery.NewRouter(allowedOrigins)
+	router := delivery.NewRouter(strings.Split(cfg.HttpServer.AllowedOriginsStr, " "))
 
 	handler := delivery.NewHandler(usecases, log, router)
 	handler.InitAPI()
@@ -79,6 +76,14 @@ func Run() {
 		WriteTimeout:   cfg.HttpServer.WriteTimeout,
 		MaxHeaderBytes: cfg.HttpServer.MaxHeaderBytes,
 	})
+
+	go func() {
+		if err := metrics.Run(cfg.Metrics.Port); err != nil {
+			log.Fatal("failed to start metrics server", err)
+		}
+	}()
+
+	log.Info("Metrics server started at port " + cfg.Metrics.Port)
 
 	go func() {
 		if err := httpServer.Run(); !errors.Is(err, http.ErrServerClosed) {

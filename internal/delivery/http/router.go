@@ -28,7 +28,7 @@ func NewRouter(origins []string) *gin.Engine {
 		AllowOrigins: origins,
 	}))
 
-	router.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, c.GetHeader("X-Request-ID")) })
+	router.GET("/ping", func(c *gin.Context) { c.String(http.StatusOK, "pong") })
 
 	return router
 }

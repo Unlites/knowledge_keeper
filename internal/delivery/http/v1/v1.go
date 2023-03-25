@@ -21,7 +21,7 @@ func NewV1Handler(usecases *usecases.Usecases, log logger.Logger, v1Group *gin.R
 }
 
 func (h *v1Handler) Init() {
-	h.v1Group.Use(h.addLoggerRequestId)
+	h.v1Group.Use(h.metrics, h.addLoggerRequestId)
 
 	authGroup := h.v1Group.Group("/auth")
 	recordGroup := h.v1Group.Group("/record", h.userIdentification, h.addLoggerUserId)

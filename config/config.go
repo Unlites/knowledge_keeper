@@ -7,12 +7,16 @@ import (
 )
 
 type HttpServer struct {
-	Port              string        `env:"HTTP_SERVER_PORT" env-default:":8080"`
+	Port              string        `env:"HTTP_SERVER_PORT" env-default:"8000"`
 	ReadTimeout       time.Duration `env:"HTTP_SERVER_READ_TIMEOUT" env-default:"10s"`
 	WriteTimeout      time.Duration `env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"10s"`
 	MaxHeaderBytes    int           `env:"HTTP_SERVER_WRITE_MAX_HEADER_BYTES" env-default:"1"`
 	ShutdownTimeout   time.Duration `env:"HTTP_SERVER_SHUTDOWN_TIMEOUT" env-default:"5s"`
 	AllowedOriginsStr string        `env:"HTTP_SERVER_ALLOWED_ORIGINS" env-default:"http://127.0.0.1:5000"`
+}
+
+type Metrics struct {
+	Port string `env:"METRICS_PORT" env-default:"9000"`
 }
 
 type Postgres struct {
@@ -32,6 +36,7 @@ type Auth struct {
 }
 type Config struct {
 	HttpServer HttpServer
+	Metrics    Metrics
 	Postgres   Postgres
 	Auth       Auth
 }
