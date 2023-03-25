@@ -37,11 +37,25 @@ services:
     container_name: prometheus
     image: prom/prometheus:v2.43.0
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     networks:
      - knowledge_keeper_network
+    restart: always
+  
+  grafana:
+    container_name: grafana
+    user: "0:0"
+    image: grafana/grafana-oss:9.4.7
+    ports:
+      - 9050:3000
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      - ./metrics/request_dashboard.json:/etc/grafana/provisioning/dashboards/request_dashboard.json
+    networks:
+     - knowledge_keeper_network
+    restart: always
 
 networks:
   knowledge_keeper_network:
