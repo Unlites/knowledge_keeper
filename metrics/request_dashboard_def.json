@@ -29,10 +29,7 @@
     "liveNow": false,
     "panels": [
         {
-            "datasource": {
-                "type": "prometheus",
-                "uid": "O0ZRDoB4z"
-            },
+            "datasource": "Prometheus",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -107,10 +104,7 @@
             },
             "targets": [
                 {
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "O0ZRDoB4z"
-                    },
+                    "datasource": "Prometheus",
                     "editorMode": "builder",
                     "expr": "app_http_request{quantile=\"0.5\"}",
                     "legendFormat": "{{status}}",
@@ -122,10 +116,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "prometheus",
-                "uid": "O0ZRDoB4z"
-            },
+            "datasource": "Prometheus",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -204,10 +195,7 @@
             "pluginVersion": "9.4.7",
             "targets": [
                 {
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "O0ZRDoB4z"
-                    },
+		    "datasource": "Prometheus",
                     "editorMode": "builder",
                     "expr": "app_http_request_count",
                     "legendFormat": "{{status}}",
@@ -219,10 +207,7 @@
             "type": "timeseries"
         },
         {
-            "datasource": {
-                "type": "prometheus",
-                "uid": "O0ZRDoB4z"
-            },
+            "datasource": "Prometheus",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -296,10 +281,7 @@
             },
             "targets": [
                 {
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "O0ZRDoB4z"
-                    },
+                    "datasource": "Prometheus",
                     "editorMode": "code",
                     "expr": "up{job=\"app\"}",
                     "legendFormat": "{{job}}",

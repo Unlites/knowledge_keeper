@@ -1,0 +1,9 @@
+apiVersion: 1
+
+providers:
+  - name: Request
+    folder: App
+    type: file
+    options:
+      path:
+        /etc/grafana/provisioning/dashboards/

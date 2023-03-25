@@ -51,8 +51,10 @@ services:
     ports:
       - 9050:3000
     volumes:
-      - ./grafana_data:/var/lib/grafana
-      - ./metrics/request_dashboard.json:/etc/grafana/provisioning/dashboards/request_dashboard.json
+      - ./.grafana_data:/var/lib/grafana
+      - ./metrics/prometheus_datasource.json:/etc/grafana/provisioning/datasources/prometheus.yml
+      - ./metrics/request_dashboard_def.json:/etc/grafana/provisioning/dashboards/request_def.json
+      - ./metrics/request_dashboard.yml:/etc/grafana/provisioning/dashboards/request.yml
     networks:
      - knowledge_keeper_network
     restart: always
