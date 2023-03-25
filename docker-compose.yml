@@ -15,7 +15,7 @@ services:
     restart: always
     networks:
       - knowledge_keeper_network
-  
+
   db:
     container_name: postgres
     image: postgres:15.1
@@ -31,8 +31,14 @@ services:
     networks:
       - knowledge_keeper_network
     restart: always
-    
+
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
 networks:
   knowledge_keeper_network:
     name: knowledge_keeper_network
-
