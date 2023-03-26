@@ -71,7 +71,7 @@ func (r *recordRepository) GetAllTopics(ctx context.Context,
 
 	topics := make([]string, 0)
 	if err := r.db.WithContext(ctx).Model(&models.Record{}).Distinct("topic").
-		Find(&topics).Error; err != nil {
+		Where("user_id = ?", userId).Find(&topics).Error; err != nil {
 
 		return nil, fmt.Errorf("failed to get topics from db - %w", err)
 	}
