@@ -6,6 +6,7 @@ services:
     build: ./
     ports:
       - 8000:8000
+    expose:
       - 9000:9000
     depends_on:
       - db
@@ -24,7 +25,7 @@ services:
       - POSTGRES_DB=knowledge_keeper_db
       - POSTGRES_USER=knowledge_keeper_user
       - POSTGRES_PASSWORD=knowledge_keeper_password
-    ports:
+    expose:
       - 5432:5432
     volumes:
       - ./.db_data/postgres/:/var/lib/postgresql/data
@@ -38,10 +39,28 @@ services:
     image: prom/prometheus:v2.43.0
     volumes:
       - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
+    expose:
       - 9090:9090
     networks:
      - knowledge_keeper_network
+    restart: always
+
+  node_exporter:
+    container_name: node_exporter
+    image: prom/node-exporter:v1.5.0
+    expose:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - knowledge_keeper_network
     restart: always
   
   grafana:
@@ -52,9 +71,8 @@ services:
       - 9050:3000
     volumes:
       - ./.grafana_data:/var/lib/grafana
-      - ./metrics/prometheus_datasource.json:/etc/grafana/provisioning/datasources/prometheus.yml
-      - ./metrics/request_dashboard_def.json:/etc/grafana/provisioning/dashboards/request_def.json
-      - ./metrics/request_dashboard.yml:/etc/grafana/provisioning/dashboards/request.yml
+      - ./metrics/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./metrics/grafana/provisioning:/etc/grafana/provisioning/dashboards
     networks:
      - knowledge_keeper_network
     restart: always

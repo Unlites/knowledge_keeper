@@ -195,9 +195,9 @@
             "pluginVersion": "9.4.7",
             "targets": [
                 {
-		    "datasource": "Prometheus",
+                    "datasource": "Prometheus",
                     "editorMode": "builder",
-                    "expr": "app_http_request_count",
+                    "expr": "rate(app_http_request_count[1m])",
                     "legendFormat": "{{status}}",
                     "range": true,
                     "refId": "A"

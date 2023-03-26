@@ -1,0 +1,16 @@
+apiVersion: 1
+
+providers:
+  - name: Request
+    folder: App
+    type: file
+    options:
+      path:
+        /etc/grafana/provisioning/dashboards/request_dashboard_def.json
+
+  - name: Node Exporter
+    folder: Node
+    type: file
+    options:
+      path:
+        /etc/grafana/provisioning/dashboards/node_exporter_full_def.json
