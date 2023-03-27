@@ -21,10 +21,12 @@ services:
   db:
     container_name: postgres
     image: postgres:15.1
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=knowledge_keeper_db
-      - POSTGRES_USER=knowledge_keeper_user
-      - POSTGRES_PASSWORD=knowledge_keeper_password
+      - POSTGRES_DB=${DB_DATABASE_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     expose:
       - 5432:5432
     volumes:
