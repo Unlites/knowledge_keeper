@@ -32,9 +32,14 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) err
 	return nil
 }
 
-func (ur *userRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (ur *userRepository) GetUserByUsername(
+	ctx context.Context,
+	username string,
+) (*models.User, error) {
 	var user *models.User
-	if err := ur.db.WithContext(ctx).First(&user, "username = ?", username).Error; err != nil {
+	if err := ur.db.WithContext(ctx).
+		First(&user, "username = ?", username).Error; err != nil {
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errs.ErrNotFound{Object: "user with username " + username}
 		}
@@ -44,9 +49,14 @@ func (ur *userRepository) GetUserByUsername(ctx context.Context, username string
 	return user, nil
 }
 
-func (ur *userRepository) GetUserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error) {
+func (ur *userRepository) GetUserByRefreshToken(
+	ctx context.Context,
+	refreshToken string,
+) (*models.User, error) {
 	var user *models.User
-	if err := ur.db.WithContext(ctx).First(&user, "refresh_token = ?", refreshToken).Error; err != nil {
+	if err := ur.db.WithContext(ctx).
+		First(&user, "refresh_token = ?", refreshToken).Error; err != nil {
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errs.ErrNotFound{Object: "user with such refresh_token"}
 		}

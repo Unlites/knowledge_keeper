@@ -12,7 +12,12 @@ type v1Handler struct {
 	v1Group  *gin.RouterGroup
 }
 
-func NewV1Handler(usecases *usecases.Usecases, log logger.Logger, v1Group *gin.RouterGroup) *v1Handler {
+func NewV1Handler(
+	usecases *usecases.Usecases,
+	log logger.Logger,
+	v1Group *gin.RouterGroup,
+) *v1Handler {
+
 	return &v1Handler{
 		usecases: usecases,
 		log:      log,

@@ -17,11 +17,13 @@ type Auth interface {
 }
 
 type Record interface {
-	CreateRecord(ctx context.Context, userId uint, record *dto.RecordDTORequest) error
+	CreateRecord(ctx context.Context, userId uint, recordDTO *dto.RecordDTORequest) error
 	GetRecordById(ctx context.Context, userId uint, id uint) (*dto.RecordDTOResponse, error)
 	GetAllRecords(ctx context.Context, userId uint, topic, title string,
 		offset, limit int) ([]*dto.RecordDTOResponse, error)
 	GetAllTopics(ctx context.Context, userId uint) ([]string, error)
+	UpdateRecord(ctx context.Context, userId, id uint, recordDTO *dto.RecordDTORequest) error
+	DeleteRecord(ctx context.Context, userId, id uint) error
 }
 
 type Usecases struct {
@@ -29,7 +31,12 @@ type Usecases struct {
 	Record
 }
 
-func NewUsecases(repo *repository.Repository, tokenManager auth.TokenManager, passwordHasher auth.PasswordHasher) *Usecases {
+func NewUsecases(
+	repo *repository.Repository,
+	tokenManager auth.TokenManager,
+	passwordHasher auth.PasswordHasher,
+) *Usecases {
+
 	return &Usecases{
 		Auth:   newAuthUsecase(repo.User, tokenManager, passwordHasher),
 		Record: newRecordUsecase(repo.Record),

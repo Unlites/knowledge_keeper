@@ -20,12 +20,20 @@ func (h *v1Handler) initAuthRoutes(authGroup *gin.RouterGroup) {
 func (h *v1Handler) signUp(c *gin.Context) {
 	var userDTO *dto.UserDTO
 	if err := c.BindJSON(&userDTO); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to bind JSON - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("failed to bind JSON - %w", err),
+		)
 		return
 	}
 
 	if err := userDTO.Validate(); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("validation error - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("validation error - %w", err),
+		)
 		return
 	}
 
@@ -48,12 +56,19 @@ func (h *v1Handler) signIn(c *gin.Context) {
 	var userDTO *dto.UserDTO
 
 	if err := c.BindJSON(&userDTO); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to bind JSON - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("failed to bind JSON - %w", err),
+		)
 		return
 	}
 
 	if err := userDTO.Validate(); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("validation error - %w", err))
+		h.newHttpErrorResponse(
+			c, http.StatusBadRequest,
+			fmt.Errorf("validation error - %w", err),
+		)
 		return
 	}
 
@@ -76,17 +91,29 @@ func (h *v1Handler) signIn(c *gin.Context) {
 func (h *v1Handler) signOut(c *gin.Context) {
 	var refreshToken *dto.RefreshTokenDTO
 	if err := c.BindJSON(&refreshToken); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to bind JSON - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("failed to bind JSON - %w", err),
+		)
 		return
 	}
 
 	if err := refreshToken.Validate(); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("validation error - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("validation error - %w", err),
+		)
 		return
 	}
 
 	if err := h.usecases.Auth.SignOut(c.Request.Context(), refreshToken); err != nil {
-		h.newHttpErrorResponse(c, http.StatusInternalServerError, fmt.Errorf("sign out error - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusInternalServerError,
+			fmt.Errorf("sign out error - %w", err),
+		)
 		return
 	}
 
@@ -96,12 +123,20 @@ func (h *v1Handler) signOut(c *gin.Context) {
 func (h *v1Handler) refresh(c *gin.Context) {
 	var refreshToken *dto.RefreshTokenDTO
 	if err := c.BindJSON(&refreshToken); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("failed to bind JSON - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("failed to bind JSON - %w", err),
+		)
 		return
 	}
 
 	if err := refreshToken.Validate(); err != nil {
-		h.newHttpErrorResponse(c, http.StatusBadRequest, fmt.Errorf("validation error - %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			fmt.Errorf("validation error - %w", err),
+		)
 		return
 	}
 

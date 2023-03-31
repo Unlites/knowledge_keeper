@@ -70,7 +70,7 @@ func (m *manager) NewRefreshToken() (*RefreshToken, error) {
 func (m *manager) ParseUserIdFromAccessToken(accessToken string) (string, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %w", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %s", token.Header["alg"])
 		}
 
 		return []byte(m.settings.SigningKey), nil

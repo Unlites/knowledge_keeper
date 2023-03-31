@@ -23,24 +23,43 @@ func (h *v1Handler) addLoggerUserId(c *gin.Context) {
 func (h *v1Handler) userIdentification(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		h.newHttpErrorResponse(c, http.StatusUnauthorized, errors.New("empty authorization header"))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusUnauthorized,
+			errors.New("empty authorization header"),
+		)
 		return
 	}
 
 	authHeaderParts := strings.Split(authHeader, " ")
 	if len(authHeaderParts) != 2 || authHeaderParts[0] != "Bearer" {
-		h.newHttpErrorResponse(c, http.StatusUnauthorized, errors.New("invalid authorization header"))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusUnauthorized,
+			errors.New("invalid authorization header"),
+		)
 		return
 	}
 
 	if len(authHeaderParts[1]) == 0 {
-		h.newHttpErrorResponse(c, http.StatusUnauthorized, errors.New("access token is empty"))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusUnauthorized,
+			errors.New("access token is empty"),
+		)
 		return
 	}
 
-	userId, err := h.usecases.Auth.ParseUserIdFromAccessToken(c.Request.Context(), authHeaderParts[1])
+	userId, err := h.usecases.Auth.ParseUserIdFromAccessToken(
+		c.Request.Context(),
+		authHeaderParts[1],
+	)
 	if err != nil {
-		h.newHttpErrorResponse(c, http.StatusUnauthorized, fmt.Errorf("parse access token error: %w", err))
+		h.newHttpErrorResponse(
+			c,
+			http.StatusUnauthorized,
+			fmt.Errorf("parse access token error: %w", err),
+		)
 		return
 	}
 

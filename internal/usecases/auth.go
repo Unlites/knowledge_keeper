@@ -19,7 +19,11 @@ type authUsecase struct {
 	passwordHasher auth.PasswordHasher
 }
 
-func newAuthUsecase(userRepo repository.User, tokenManager auth.TokenManager, passwordHasher auth.PasswordHasher) *authUsecase {
+func newAuthUsecase(
+	userRepo repository.User,
+	tokenManager auth.TokenManager,
+	passwordHasher auth.PasswordHasher,
+) *authUsecase {
 	return &authUsecase{
 		userRepo:       userRepo,
 		tokenManager:   tokenManager,
@@ -45,13 +49,19 @@ func (au *authUsecase) SignUp(ctx context.Context, userDTO *dto.UserDTO) error {
 	return nil
 }
 
-func (au *authUsecase) SignIn(ctx context.Context, userDTO *dto.UserDTO) (*dto.TokensDTO, error) {
+func (au *authUsecase) SignIn(
+	ctx context.Context,
+	userDTO *dto.UserDTO,
+) (*dto.TokensDTO, error) {
 	user, err := au.userRepo.GetUserByUsername(ctx, userDTO.Username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by username - %w", err)
 	}
 
-	if err := au.passwordHasher.Compare(userDTO.Password, user.PasswordHash); err != nil {
+	if err := au.passwordHasher.Compare(
+		userDTO.Password,
+		user.PasswordHash,
+	); err != nil {
 		return nil, errs.ErrIncorrectPassword
 	}
 
@@ -63,7 +73,10 @@ func (au *authUsecase) SignIn(ctx context.Context, userDTO *dto.UserDTO) (*dto.T
 	return tokensDTO, nil
 }
 
-func (au *authUsecase) SignOut(ctx context.Context, refreshToken *dto.RefreshTokenDTO) error {
+func (au *authUsecase) SignOut(
+	ctx context.Context,
+	refreshToken *dto.RefreshTokenDTO,
+) error {
 	user, err := au.userRepo.GetUserByRefreshToken(ctx, refreshToken.Token)
 	if err != nil {
 		return fmt.Errorf("failed to get user by refresh token - %w", err)
@@ -79,7 +92,10 @@ func (au *authUsecase) SignOut(ctx context.Context, refreshToken *dto.RefreshTok
 	return nil
 }
 
-func (au *authUsecase) RefreshTokens(ctx context.Context, refreshToken *dto.RefreshTokenDTO) (*dto.TokensDTO, error) {
+func (au *authUsecase) RefreshTokens(
+	ctx context.Context,
+	refreshToken *dto.RefreshTokenDTO,
+) (*dto.TokensDTO, error) {
 	user, err := au.userRepo.GetUserByRefreshToken(ctx, refreshToken.Token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by refresh token - %w", err)
@@ -97,7 +113,10 @@ func (au *authUsecase) RefreshTokens(ctx context.Context, refreshToken *dto.Refr
 	return tokensDTO, nil
 }
 
-func (au *authUsecase) ParseUserIdFromAccessToken(ctx context.Context, accessToken string) (string, error) {
+func (au *authUsecase) ParseUserIdFromAccessToken(
+	ctx context.Context,
+	accessToken string,
+) (string, error) {
 	userId, err := au.tokenManager.ParseUserIdFromAccessToken(accessToken)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse user id from access token - %w", err)
@@ -106,7 +125,10 @@ func (au *authUsecase) ParseUserIdFromAccessToken(ctx context.Context, accessTok
 	return userId, nil
 }
 
-func (au *authUsecase) updateUserTokens(ctx context.Context, user *models.User) (*dto.TokensDTO, error) {
+func (au *authUsecase) updateUserTokens(
+	ctx context.Context,
+	user *models.User,
+) (*dto.TokensDTO, error) {
 	accessToken, err := au.tokenManager.NewAccessToken(strconv.Itoa(int(user.Id)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token - %w", err)

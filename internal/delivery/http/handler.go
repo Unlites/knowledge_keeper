@@ -13,7 +13,12 @@ type Handler struct {
 	router   *gin.Engine
 }
 
-func NewHandler(usecases *usecases.Usecases, log logger.Logger, router *gin.Engine) *Handler {
+func NewHandler(
+	usecases *usecases.Usecases,
+	log logger.Logger,
+	router *gin.Engine,
+) *Handler {
+
 	return &Handler{
 		usecases: usecases,
 		log:      log,
