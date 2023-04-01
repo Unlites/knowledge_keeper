@@ -227,9 +227,16 @@ func (h *v1Handler) updateRecord(c *gin.Context) {
 	}
 
 	if err := h.usecases.UpdateRecord(c, userId, id, recordDTO); err != nil {
+		status := http.StatusInternalServerError
+
+		var errNotFound *errs.ErrNotFound
+		if errors.As(err, &errNotFound) {
+			status = http.StatusNotFound
+		}
+
 		h.newHttpErrorResponse(
 			c,
-			http.StatusBadRequest,
+			status,
 			fmt.Errorf("update record error - %w", err),
 		)
 		return
@@ -258,9 +265,16 @@ func (h *v1Handler) deleteRecord(c *gin.Context) {
 		)
 	}
 	if err := h.usecases.DeleteRecord(c, userId, id); err != nil {
+		status := http.StatusInternalServerError
+
+		var errNotFound *errs.ErrNotFound
+		if errors.As(err, &errNotFound) {
+			status = http.StatusNotFound
+		}
+
 		h.newHttpErrorResponse(
 			c,
-			http.StatusBadRequest,
+			status,
 			fmt.Errorf("delete record error - %w", err),
 		)
 		return
