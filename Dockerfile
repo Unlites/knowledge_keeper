@@ -1,4 +1,4 @@
-FROM golang:1.19.5-buster
+FROM golang:1.19.5-buster as builder
 
 WORKDIR /app
 
@@ -9,8 +9,11 @@ RUN go mod download
 
 COPY . .
 
-# RUN go build -o /bin/knowledge_keeper ./cmd/knowledge_keeper/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /knowledge_keeper ./cmd/knowledge_keeper/main.go
 
-# CMD ["/bin/knowledge_keeper"]
+FROM scratch
 
-CMD ["go", "run", "./cmd/knowledge_keeper/main.go"]
+COPY --from=builder knowledge_keeper /bin/knowledge_keeper
+COPY --from=builder /app/migrations /migrations
+
+CMD ["/bin/knowledge_keeper"]

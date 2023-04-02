@@ -47,7 +47,7 @@ func Run() {
 		log.Fatal("failed to connect to Postgres for migrations", err)
 	}
 
-	if err := goose.Up(sqlDbForMigrations, "/app/migrations"); err != nil {
+	if err := goose.Up(sqlDbForMigrations, "/migrations"); err != nil {
 		log.Fatal("failed to make migrations", err)
 	}
 

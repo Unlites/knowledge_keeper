@@ -12,8 +12,6 @@ services:
       - db
     env_file:
       - .env
-    volumes:
-      - .:/app
     restart: always
     networks:
       - knowledge_keeper_network
