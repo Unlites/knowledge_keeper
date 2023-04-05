@@ -15,6 +15,11 @@ type HttpServer struct {
 	AllowedOriginsStr string        `env:"HTTP_SERVER_ALLOWED_ORIGINS" env-default:"http://127.0.0.1:5000"`
 }
 
+type Migrations struct {
+	WithDowngrade bool   `env:"MIGRATIONS_DOWNGRADE" env-default:"0"`
+	Directory     string `env:"MIGRATIONS_DIR" env-default:"MIGRATIONS_DIR"`
+}
+
 type Metrics struct {
 	Port string `env:"METRICS_PORT" env-default:"9000"`
 }
@@ -36,6 +41,7 @@ type Auth struct {
 }
 type Config struct {
 	HttpServer HttpServer
+	Migrations Migrations
 	Metrics    Metrics
 	Postgres   Postgres
 	Auth       Auth

@@ -26,10 +26,11 @@ func (ru *recordUsecase) CreateRecord(
 ) error {
 
 	record := &models.Record{
-		Topic:   recordDTO.Topic,
-		Title:   recordDTO.Title,
-		Content: recordDTO.Content,
-		UserId:  userId,
+		Topic:    recordDTO.Topic,
+		Title:    recordDTO.Title,
+		Subtopic: recordDTO.Subtopic,
+		Content:  recordDTO.Content,
+		UserId:   userId,
 	}
 
 	if err := ru.recordRepo.CreateRecord(ctx, record); err != nil {
@@ -50,17 +51,18 @@ func (ru *recordUsecase) GetRecordById(
 	}
 
 	return &dto.RecordDTOResponse{
-		Id:      record.Id,
-		Topic:   record.Topic,
-		Title:   record.Title,
-		Content: record.Content,
+		Id:       record.Id,
+		Topic:    record.Topic,
+		Subtopic: record.Subtopic,
+		Title:    record.Title,
+		Content:  record.Content,
 	}, nil
 }
 
 func (ru *recordUsecase) GetAllRecords(
 	ctx context.Context,
 	userId uint,
-	topic, title string,
+	topic, subtopic, title string,
 	offset, limit int,
 ) ([]*dto.RecordDTOResponse, error) {
 
@@ -68,6 +70,7 @@ func (ru *recordUsecase) GetAllRecords(
 		ctx,
 		userId,
 		topic,
+		subtopic,
 		title,
 		offset,
 		limit,
@@ -97,6 +100,20 @@ func (ru *recordUsecase) GetAllTopics(
 	return topics, nil
 }
 
+func (ru *recordUsecase) GetAllSubtopicsByTopic(
+	ctx context.Context,
+	userId uint,
+	topic string,
+) ([]string, error) {
+
+	topics, err := ru.recordRepo.GetAllSubtopicsByTopic(ctx, userId, topic)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get subtopics - %w", err)
+	}
+
+	return topics, nil
+}
+
 func (ru *recordUsecase) UpdateRecord(
 	ctx context.Context,
 	userId, id uint,
@@ -109,6 +126,7 @@ func (ru *recordUsecase) UpdateRecord(
 	}
 
 	record.Topic = recordDTO.Topic
+	record.Subtopic = recordDTO.Subtopic
 	record.Title = recordDTO.Title
 	record.Content = recordDTO.Content
 
@@ -138,9 +156,10 @@ func (ru *recordUsecase) DeleteRecord(
 
 func toDTO(record *models.Record) *dto.RecordDTOResponse {
 	return &dto.RecordDTOResponse{
-		Id:      record.Id,
-		Topic:   record.Topic,
-		Title:   record.Title,
-		Content: record.Content,
+		Id:       record.Id,
+		Topic:    record.Topic,
+		Subtopic: record.Subtopic,
+		Title:    record.Title,
+		Content:  record.Content,
 	}
 }

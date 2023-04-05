@@ -47,8 +47,14 @@ func Run() {
 		log.Fatal("failed to connect to Postgres for migrations", err)
 	}
 
-	if err := goose.Up(sqlDbForMigrations, "/migrations"); err != nil {
-		log.Fatal("failed to make migrations", err)
+	if cfg.Migrations.WithDowngrade {
+		if err := goose.Down(sqlDbForMigrations, cfg.Migrations.Directory); err != nil {
+			log.Fatal("failed to down migrations", err)
+		}
+	} else {
+		if err := goose.Up(sqlDbForMigrations, cfg.Migrations.Directory); err != nil {
+			log.Fatal("failed to up migrations", err)
+		}
 	}
 
 	tokenManager := auth.NewTokenManager(&auth.TokenManagerSettings{

@@ -19,9 +19,10 @@ type Auth interface {
 type Record interface {
 	CreateRecord(ctx context.Context, userId uint, recordDTO *dto.RecordDTORequest) error
 	GetRecordById(ctx context.Context, userId uint, id uint) (*dto.RecordDTOResponse, error)
-	GetAllRecords(ctx context.Context, userId uint, topic, title string,
+	GetAllRecords(ctx context.Context, userId uint, topic, subtopic, title string,
 		offset, limit int) ([]*dto.RecordDTOResponse, error)
 	GetAllTopics(ctx context.Context, userId uint) ([]string, error)
+	GetAllSubtopicsByTopic(ctx context.Context, userId uint, topic string) ([]string, error)
 	UpdateRecord(ctx context.Context, userId, id uint, recordDTO *dto.RecordDTORequest) error
 	DeleteRecord(ctx context.Context, userId, id uint) error
 }

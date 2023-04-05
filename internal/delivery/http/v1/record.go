@@ -16,6 +16,7 @@ func (h *v1Handler) initRecordRoutes(recordGroup *gin.RouterGroup) {
 	recordGroup.GET("/:id", h.getRecordById)
 	recordGroup.GET("", h.getAllRecords)
 	recordGroup.GET("/topics", h.getAllTopics)
+	recordGroup.GET("/subtopics", h.getAllSubtopicsByTopic)
 	recordGroup.PUT("/:id", h.updateRecord)
 	recordGroup.DELETE("/:id", h.deleteRecord)
 }
@@ -123,6 +124,7 @@ func (h *v1Handler) getAllRecords(c *gin.Context) {
 	}
 
 	topic := c.DefaultQuery("topic", "")
+	subtopic := c.DefaultQuery("subtopic", "")
 	title := c.DefaultQuery("title", "")
 	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
 	if err != nil {
@@ -147,6 +149,7 @@ func (h *v1Handler) getAllRecords(c *gin.Context) {
 		c.Request.Context(),
 		userId,
 		topic,
+		subtopic,
 		title,
 		offset,
 		limit,
@@ -185,6 +188,40 @@ func (h *v1Handler) getAllTopics(c *gin.Context) {
 	}
 
 	h.newHttpSuccessResponse(c, topics)
+}
+
+func (h *v1Handler) getAllSubtopicsByTopic(c *gin.Context) {
+	userId, err := h.getUserId(c)
+	if err != nil {
+		h.newHttpErrorResponse(
+			c,
+			http.StatusInternalServerError,
+			fmt.Errorf("failed to get user id - %w", err),
+		)
+		return
+	}
+
+	topic := c.Query("topic")
+	if topic == "" {
+		h.newHttpErrorResponse(
+			c,
+			http.StatusBadRequest,
+			errors.New("query param topic is required"),
+		)
+		return
+	}
+
+	subtopics, err := h.usecases.GetAllSubtopicsByTopic(c, userId, topic)
+	if err != nil {
+		h.newHttpErrorResponse(
+			c,
+			http.StatusInternalServerError,
+			fmt.Errorf("get all subtopics error - %w", err),
+		)
+		return
+	}
+
+	h.newHttpSuccessResponse(c, subtopics)
 }
 
 func (h *v1Handler) updateRecord(c *gin.Context) {

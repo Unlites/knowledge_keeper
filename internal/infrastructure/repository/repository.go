@@ -18,8 +18,9 @@ type Record interface {
 	CreateRecord(ctx context.Context, record *models.Record) error
 	GetRecordById(ctx context.Context, userId uint, id uint) (*models.Record, error)
 	GetAllRecords(ctx context.Context, userId uint,
-		topic, title string, offset, limit int) ([]*models.Record, error)
+		topic, subtopic, title string, offset, limit int) ([]*models.Record, error)
 	GetAllTopics(ctx context.Context, userId uint) ([]string, error)
+	GetAllSubtopicsByTopic(ctx context.Context, userId uint, topic string) ([]string, error)
 	UpdateRecord(ctx context.Context, record *models.Record) error
 	DeleteRecord(ctx context.Context, record *models.Record) error
 }

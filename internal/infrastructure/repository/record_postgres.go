@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/Unlites/knowledge_keeper/internal/errs"
 	"github.com/Unlites/knowledge_keeper/internal/models"
@@ -56,6 +57,7 @@ func (r *recordRepository) GetAllRecords(
 	ctx context.Context,
 	userId uint,
 	topic,
+	subtopic string,
 	title string,
 	offset,
 	limit int,
@@ -64,6 +66,9 @@ func (r *recordRepository) GetAllRecords(
 	condition := r.db.Where("user_id = ?", userId)
 	if topic != "" {
 		condition = condition.Where("topic = ?", topic)
+	}
+	if subtopic != "" {
+		condition = condition.Where("subtopic = ?", subtopic)
 	}
 	if title != "" {
 		condition = condition.Where("title iLIKE ?", "%"+title+"%")
@@ -97,6 +102,28 @@ func (r *recordRepository) GetAllTopics(
 	}
 
 	return topics, nil
+}
+
+func (r *recordRepository) GetAllSubtopicsByTopic(
+	ctx context.Context,
+	userId uint,
+	topic string,
+) ([]string, error) {
+
+	subtopics := make([]string, 0)
+	if err := r.db.WithContext(ctx).
+		Model(&models.Record{}).
+		Distinct("subtopic").
+		Where("user_id = ? AND topic = ?", userId, topic).
+		Find(&subtopics).Error; err != nil {
+		return nil, fmt.Errorf("failed to get subtopics from db - %w", err)
+	}
+	log.Println(subtopics)
+	if len(subtopics) == 1 && subtopics[0] == "" {
+		return make([]string, 0), nil
+	}
+
+	return subtopics, nil
 }
 
 func (r *recordRepository) UpdateRecord(
